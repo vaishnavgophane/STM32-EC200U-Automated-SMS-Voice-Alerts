@@ -1,0 +1,4 @@
+../Core/Src/main.c:80:6:send_uart	1
+../Core/Src/main.c:91:5:main	18
+../Core/Src/main.c:261:6:SystemClock_Config	3
+../Core/Src/main.c:311:6:Error_Handler	1

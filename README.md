@@ -54,7 +54,7 @@ Demonstrates **production-ready** cellular communication with:
     Correct pulse length is mandatory for EC200U boot.
 
 ## UART DMA RX 
-    Zero-CPU reception using DMA + IDLE line detection
+* Zero-CPU reception using DMA + IDLE line detection
     ```c
     HAL_UART_Receive_DMA(&huart1, dma_rx_buf, RX_BUF_SIZE);
     ```

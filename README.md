@@ -114,41 +114,14 @@ case NET_CHECK:
 case SMS_SEND:
     send("AT+CMGF=1\r\n");
     send("AT+CMGS=\"+91XXXXXXXXXX\"\r\n");
-    send("Hello from STM32!\x1A");   // Ctrl-Z = SMS end
+    send("Hello from STM32 Nucleo-F411RE");   // Ctrl-Z
     if (RESP("+CMGS")) modem_state = IDLE;
     break;
 
-case IDLE:
-    /* System ready */
-    break;
-}switch (modem_state)
-{
-case AT_CHECK:
-    send("AT\r\n");
-    if (OK()) modem_state = ECHO_OFF;
-    break;
-
-case ECHO_OFF:
-    send("ATE0\r\n");
-    if (OK()) modem_state = SIM_CHECK;
-    break;
-
-case SIM_CHECK:
-    send("AT+CPIN?\r\n");
-    if (RESP("+CPIN: READY")) modem_state = NET_CHECK;
-    break;
-
-case NET_CHECK:
-    send("AT+CREG?\r\n");
-    if (RESP("+CREG: 0,1") || RESP("+CREG: 0,5"))
-        modem_state = SMS_SEND;
-    break;
-
-case SMS_SEND:
-    send("AT+CMGF=1\r\n");
-    send("AT+CMGS=\"+91XXXXXXXXXX\"\r\n");
-    send("Hello from STM32!\x1A");   // Ctrl-Z
-    if (RESP("+CMGS")) modem_state = IDLE;
+case CALLING:
+    send("ATD+91XXXXXXXXXX;\r\n");      // Voice call
+    if (RESP("OK") || RESP("NO CARRIER"))
+        modem_state = IDLE;
     break;
 
 case IDLE:
@@ -158,8 +131,8 @@ case IDLE:
 ```
 
 ## ERROR RECOVERY
-    +CME ERROR → AT+CFUN=1,1 (Modem reset)
-    Retry previous FSM state
++CME ERROR → AT+CFUN=1,1 (Modem reset)
+   * Retry previous FSM state
  ```c
 if (RESP("+CME ERROR"))
 {

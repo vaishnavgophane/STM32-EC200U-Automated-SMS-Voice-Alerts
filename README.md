@@ -49,8 +49,6 @@ Demonstrates **production-ready** cellular communication with:
 ---
 # STM32 + EC200U MODEM FLOW (Standard Procedure) (DMA + FSM, PRODUCTION READY)
 
----
-
 ## MODEM POWER ON SEQUENCE
     PWRKEY (PA5):
     HIGH → 500ms → LOW (1.2s) → HIGH

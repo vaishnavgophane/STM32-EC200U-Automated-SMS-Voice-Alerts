@@ -11,7 +11,6 @@ Pune, India.
 
 # STM32 Nucleo-F411RE + Quectel EC200U LTE IoT Gateway
 
----
 
 **Automated SMS + Voice Call IoT Gateway using STM32 DMA + Quectel EC200U LTE Cat1 Module**
 

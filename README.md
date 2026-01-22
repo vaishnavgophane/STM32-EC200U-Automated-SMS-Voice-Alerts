@@ -62,6 +62,7 @@ Demonstrates **production-ready** cellular communication with:
 HAL_UART_Receive_DMA(&huart1, dma_rx_buf, RX_BUF_SIZE);
 
 /* ================= UART IDLE ISR ================= */
+```c
 void USART1_IRQHandler(void)
 {
     if (UART_IDLE_DETECTED)
@@ -74,21 +75,25 @@ void USART1_IRQHandler(void)
     }
     HAL_UART_IRQHandler(&huart1);
 }
+```
 
-/* ===================== 4. FINITE STATE MACHINE =====================
+## Finite State Machine (FSM)
 
-AT_CHECK  -> OK
-ECHO_OFF  -> OK
-SIM_CHECK -> +CPIN: READY
-SIM_VOLT  -> +QUSIM
-NET_CHECK -> +CREG: 1 or 5
-SMS_CMD   -> OK
-SMS_BODY  -> +CMGS
-CALLING   -> OK / NO CARRIER
-IDLE
-*/
+| State       | AT Command / Action | Expected Response            | Description                          |
+|------------|---------------------|------------------------------|--------------------------------------|
+| AT_CHECK   | `AT`                | `OK`                         | Check modem communication             |
+| ECHO_OFF  | `ATE0`              | `OK`                         | Disable command echo                  |
+| SIM_CHECK | `AT+CPIN?`           | `+CPIN: READY`               | Verify SIM card status                |
+| SIM_VOLT  | `AT+QUSIM?`          | `+QUSIM`                     | Check SIM voltage / presence          |
+| NET_CHECK | `AT+CREG?`           | `+CREG: 1` or `+CREG: 5`     | Network registration status           |
+| SMS_CMD   | `AT+CMGS`            | `OK`                         | Initiate SMS send command             |
+| SMS_BODY  | SMS Payload          | `+CMGS`                      | SMS sent confirmation                 |
+| CALLING   | `ATD<number>;`       | `OK` / `NO CARRIER`          | Call status                           |
+| IDLE      | —                   | —                            | Waiting / standby state               |
+
 
 /* ================= MODEM FSM ================= */
+```c
 switch (modem_state)
 {
 case AT_CHECK:
@@ -122,22 +127,60 @@ case SMS_SEND:
 case IDLE:
     /* System ready */
     break;
+}switch (modem_state)
+{
+case AT_CHECK:
+    send("AT\r\n");
+    if (OK()) modem_state = ECHO_OFF;
+    break;
+
+case ECHO_OFF:
+    send("ATE0\r\n");
+    if (OK()) modem_state = SIM_CHECK;
+    break;
+
+case SIM_CHECK:
+    send("AT+CPIN?\r\n");
+    if (RESP("+CPIN: READY")) modem_state = NET_CHECK;
+    break;
+
+case NET_CHECK:
+    send("AT+CREG?\r\n");
+    if (RESP("+CREG: 0,1") || RESP("+CREG: 0,5"))
+        modem_state = SMS_SEND;
+    break;
+
+case SMS_SEND:
+    send("AT+CMGF=1\r\n");
+    send("AT+CMGS=\"+91XXXXXXXXXX\"\r\n");
+    send("Hello from STM32!\x1A");   // Ctrl-Z
+    if (RESP("+CMGS")) modem_state = IDLE;
+    break;
+
+case IDLE:
+    // System ready
+    break;
 }
+```
 
 /* ================= ERROR RECOVERY =================
  * +CME ERROR → AT+CFUN=1,1 (Modem reset)
  * Retry previous FSM state
  */
+ ```c
 if (RESP("+CME ERROR"))
 {
     send("AT+CFUN=1,1\r\n");
     modem_state = PREV_STATE;
 }
+```
+## Design Summary
 
-/* ================= DESIGN SUMMARY =================
- * DMA + IDLE   : Zero CPU overhead
- * FSM          : Deterministic control
- * Exact parse  : Robust AT handling
- * Auto-recover : Self-healing system
- * RAM usage    : ~2 KB (RX + response buffers)
- */
+| Feature        | Description                              |
+|---------------|------------------------------------------|
+| DMA + IDLE    | Zero CPU overhead during UART reception  |
+| FSM           | Deterministic and predictable control    |
+| Exact Parse   | Robust and reliable AT command handling  |
+| Auto-recover  | Self-healing system on errors or faults  |
+| RAM Usage     | ~2 KB (RX buffer + response buffers)     |
+

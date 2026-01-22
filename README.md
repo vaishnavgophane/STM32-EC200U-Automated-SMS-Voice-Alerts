@@ -33,10 +33,6 @@ Demonstrates **production-ready** cellular communication with:
 | Voice calling (ATD) | ✅ |
 | Error handling + retries | ✅ |
 
-## UART2 for Debug Messages Printing
-**PuTTY**: ST-LINK VCP @ 115200 baud
-
-
 ## 🚀 Usage
 
 1. **Wire EC200U** per diagram above

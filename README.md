@@ -24,7 +24,7 @@ Demonstrates **production-ready** cellular communication with:
 ## 🎯 Features
 | Feature | Status |
 |---------|--------|
-| DMA UART RX (USART1) | ✅ Production Ready |
+| DMA UART RX (USART1) | ✅ |
 | Debug UART TX (USART2→PuTTY) | ✅ |
 | EC200U PWRKEY control (PA5) | ✅ |
 | SIM detection (+CPIN?) | ✅ |

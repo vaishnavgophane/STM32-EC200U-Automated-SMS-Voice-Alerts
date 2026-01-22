@@ -47,23 +47,21 @@ Demonstrates **production-ready** cellular communication with:
 5. **Watch automation**:
 
 ---
- * STM32 + EC200U MODEM FLOW (Standard Procedure) (DMA + FSM, PRODUCTION READY)
-
-
-## MODEM POWER ON Sequence
-    PWRKEY (PA5):
-    HIGH → 500ms → LOW (1.2s) → HIGH
-    Correct pulse length is mandatory for EC200U boot.
+# STM32 + EC200U MODEM FLOW (Standard Procedure) (DMA + FSM, PRODUCTION READY)
 
 ---
 
+## MODEM POWER ON SEQUENCE
+    PWRKEY (PA5):
+    HIGH → 500ms → LOW (1.2s) → HIGH
+    Correct pulse length is mandatory for EC200U boot.
 
 ## UART DMA RX 
     Zero-CPU reception using DMA + IDLE line detection
     ```c
     HAL_UART_Receive_DMA(&huart1, dma_rx_buf, RX_BUF_SIZE);
     ```
----
+    
 ## UART IDLE ISR 
 ```c
 void USART1_IRQHandler(void)
@@ -95,7 +93,7 @@ void USART1_IRQHandler(void)
 | IDLE      | —                   | —                            | Waiting / standby state               |
 
 
-/* ================= MODEM FSM ================= */
+## MODEM FSM
 ```c
 switch (modem_state)
 {

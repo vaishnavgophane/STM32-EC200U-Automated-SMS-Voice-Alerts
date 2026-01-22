@@ -83,6 +83,7 @@ void USART1_IRQHandler(void)
 | SMS_CMD   | `AT+CMGS`            | `OK`                         | Initiate SMS send command             |
 | SMS_BODY  | SMS Payload          | `+CMGS`                      | SMS sent confirmation                 |
 | CALLING   | `ATD<number>;`       | `OK` / `NO CARRIER`          | Call status                           |
+| CALL_HANGUP    | `ATH`       | `OK`          | Auto Hang up call               |
 | IDLE      | —                   | —                            | Waiting / standby state               |
 
 
@@ -114,14 +115,19 @@ case NET_CHECK:
 case SMS_SEND:
     send("AT+CMGF=1\r\n");
     send("AT+CMGS=\"+91XXXXXXXXXX\"\r\n");
-    send("Hello from STM32 Nucleo-F411RE");   // Ctrl-Z
-    if (RESP("+CMGS")) modem_state = IDLE;
+    send("Hello from STM32!\x1A");      // Ctrl-Z
+    if (RESP("+CMGS")) modem_state = CALLING;
     break;
 
 case CALLING:
     send("ATD+91XXXXXXXXXX;\r\n");      // Voice call
     if (RESP("OK") || RESP("NO CARRIER"))
-        modem_state = IDLE;
+        modem_state = CALL_HANGUP;
+    break;
+
+case CALL_HANGUP:
+    send("ATH\r\n");                     // Hangup
+    if (RESP("OK")) modem_state = IDLE;
     break;
 
 case IDLE:

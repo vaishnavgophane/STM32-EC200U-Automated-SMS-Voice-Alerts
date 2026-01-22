@@ -46,22 +46,25 @@ Demonstrates **production-ready** cellular communication with:
 4. **Open PuTTY** → ST-LINK COM @ 115200
 5. **Watch automation**:
 
-/*****************************************************************
+---
  * STM32 + EC200U MODEM FLOW (Standard Procedure) (DMA + FSM, PRODUCTION READY)
- *****************************************************************/
 
-/* ================= MODEM POWER ON =================
- * PWRKEY (PA5):
- * HIGH → 500ms → LOW (1.2s) → HIGH
- * Correct pulse length is mandatory for EC200U boot.
- */
 
-/* ================= UART DMA RX =================
- * Zero-CPU reception using DMA + IDLE line detection
- */
-HAL_UART_Receive_DMA(&huart1, dma_rx_buf, RX_BUF_SIZE);
+## MODEM POWER ON Sequence
+    PWRKEY (PA5):
+    HIGH → 500ms → LOW (1.2s) → HIGH
+    Correct pulse length is mandatory for EC200U boot.
 
-/* ================= UART IDLE ISR ================= */
+---
+
+
+## UART DMA RX 
+    Zero-CPU reception using DMA + IDLE line detection
+    ```c
+    HAL_UART_Receive_DMA(&huart1, dma_rx_buf, RX_BUF_SIZE);
+    ```
+---
+## UART IDLE ISR 
 ```c
 void USART1_IRQHandler(void)
 {
@@ -163,10 +166,9 @@ case IDLE:
 }
 ```
 
-/* ================= ERROR RECOVERY =================
- * +CME ERROR → AT+CFUN=1,1 (Modem reset)
- * Retry previous FSM state
- */
+## ERROR RECOVERY
+    +CME ERROR → AT+CFUN=1,1 (Modem reset)
+    Retry previous FSM state
  ```c
 if (RESP("+CME ERROR"))
 {
